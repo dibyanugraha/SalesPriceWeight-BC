@@ -1,0 +1,35 @@
+{
+    "id": "550ca23a-1ca0-4292-9eb9-7923ad367e48",
+    "name": "Sales Price and Discount Weighting",
+    "publisher": "Ariestya Dibyanugraha",
+    "version": "1.0.0.0",
+    "brief": "Add weighting/priorities to sales prices and discount.",
+    "description": "Add weighting/priorities to sales prices and discount. Specific price/discount for customer will be most prioritized, then customer group, campaign, and the least all customers. This will override how pricing/discount works.",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [{
+            "id": "63ca2fa4-4f03-4f2b-a480-172fef340d3f",
+            "publisher": "Microsoft",
+            "name": "System Application",
+            "version": "16.0.0.0"
+        },
+        {
+            "id": "437dbf0e-84ff-417a-965d-ed2bb9650972",
+            "publisher": "Microsoft",
+            "name": "Base Application",
+            "version": "16.0.0.0"
+        }
+    ],
+    "screenshots": [],
+    "platform": "16.0.0.0",
+    "idRanges": [{
+        "from": 50000,
+        "to": 99999
+    }],
+    "contextSensitiveHelpUrl": "https://dibyanugraha.wordpress.com/",
+    "showMyCode": true,
+    "runtime": "5.0"
+}
