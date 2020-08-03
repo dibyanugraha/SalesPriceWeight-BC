@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "al",
+            "request": "launch",
+            "name": "Microsoft cloud sandbox",
+            "breakOnError": true,
+            "launchBrowser": false,
+            "breakOnRecordWrite": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "disableHttpRequestTimeout": true,
+            "sandboxName": "sandboxw1",
+            "longRunningSqlStatementsThreshold": 500,
+            "numberOfSqlStatements": 10,
+        }
+    ]
+}
