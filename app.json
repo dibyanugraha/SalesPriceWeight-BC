@@ -1,10 +1,10 @@
 {
     "id": "550ca23a-1ca0-4292-9eb9-7923ad367e48",
-    "name": "Sales Price and Discount Weighting",
+    "name": "Sales Price Weighting",
     "publisher": "Ariestya Dibyanugraha",
     "version": "1.0.0.0",
-    "brief": "Add weighting/priorities to sales prices and discount.",
-    "description": "Add weighting/priorities to sales prices and discount. Specific price/discount for customer will be most prioritized, then customer group, campaign, and the least all customers. This will override how pricing/discount works.",
+    "brief": "Add weighting/priorities to sales prices.",
+    "description": "Add weighting/priorities to sales prices. Specific price for customer will be most prioritized, then customer group, campaign, and the least all customers. This will override how pricing/discount works.",
     "privacyStatement": "",
     "EULA": "",
     "help": "",
