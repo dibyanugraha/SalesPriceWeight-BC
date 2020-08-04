@@ -148,8 +148,9 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
     local procedure AddSupportedSetup(var TempPriceCalculationSetup: Record "Price Calculation Setup" temporary)
     begin
         TempPriceCalculationSetup.Init();
+        TempPriceCalculationSetup."Asset Type" := TempPriceCalculationSetup."Asset Type"::Item;
         TempPriceCalculationSetup.Validate(Implementation, TempPriceCalculationSetup.Implementation::"Business Central (Version 16.0)");
-        TempPriceCalculationSetup.Method := TempPriceCalculationSetup.Method::"Least Weight";
+        TempPriceCalculationSetup.Method := TempPriceCalculationSetup.Method::"Weight";
         TempPriceCalculationSetup.Enabled := not IsDisabled();
         TempPriceCalculationSetup.Type := TempPriceCalculationSetup.Type::Purchase;
         TempPriceCalculationSetup.Insert(true);

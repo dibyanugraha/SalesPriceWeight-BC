@@ -63,6 +63,16 @@ page 50002 ad_SalesPriceWeightWizard
             group(Step3)
             {
                 Visible = Step3Visible;
+
+                //  run ad_PriceCalculationByWeight to set price calculation default
+                //  make sure new weight default is on
+                //  activate sales price calculation in sales setup
+                group(Activate)
+                {
+                    Visible = Step3Visible;
+                    Caption = 'You will need to change ';
+                    InstructionalText = 'To prepare Dynamics 365 Business Central Sales Price Weight extension.';
+                }
             }
         }
     }

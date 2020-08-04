@@ -1,4 +1,4 @@
-page 50000 "ad_Price Calculation Setup"
+page 50000 ad_PriceCalculationSetup
 {
     Caption = 'Price Calculation Setup';
     PageType = List;

@@ -5,6 +5,7 @@ codeunit 50002 ad_SalesPriceWeightInstall
 
     trigger OnInstallAppPerCompany();
     begin
+        //  run ad_PriceCalculationByWeight
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Assisted Setup", 'OnRegister', '', true, true)]

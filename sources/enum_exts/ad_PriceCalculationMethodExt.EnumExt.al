@@ -1,6 +1,6 @@
-enumextension 50000 ad_ extends "Price Calculation Method"
+enumextension 50000 ad_PriceCalculationMethodExt extends "Price Calculation Method"
 {
-    value(50000; "Least Weight")
+    value(50000; "Weight")
     {
     }
 }

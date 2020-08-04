@@ -1,4 +1,4 @@
-pageextension 50000 ad_ extends "Sales Prices"
+pageextension 50000 ad_SalesPriceExt extends "Sales Prices"
 {
     layout
     {
