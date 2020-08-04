@@ -1,9 +1,7 @@
 page 50002 ad_SalesPriceWeightWizard
 {
-    Caption = 'Sales Price Weight Setup Wizard';
+    Caption = 'Sales Price Weight Setup';
     PageType = NavigatePage;
-    SourceTable = ad_SalesPriceSourceTypeWeight;
-    SourceTableTemporary = true;
 
     layout
     {
@@ -11,9 +9,9 @@ page 50002 ad_SalesPriceWeightWizard
         {
             group(StandardBanner)
             {
-                Caption = '';
+                ShowCaption = false;
                 Editable = false;
-                Visible = TopBannerVisible and not FinishActionEnabled;
+                Visible = TopBannerVisible and not DoneVisible;
                 field(MediaResourcesStd; MediaResourcesStd."Media Reference")
                 {
                     ApplicationArea = All;
@@ -23,9 +21,9 @@ page 50002 ad_SalesPriceWeightWizard
             }
             group(FinishedBanner)
             {
-                Caption = '';
+                ShowCaption = false;
                 Editable = false;
-                Visible = TopBannerVisible and FinishActionEnabled;
+                Visible = TopBannerVisible and DoneVisible;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
                     ApplicationArea = All;
@@ -33,31 +31,33 @@ page 50002 ad_SalesPriceWeightWizard
                     ShowCaption = false;
                 }
             }
-            group(Step1)
+            group(WelcomeScreen)
             {
+                ShowCaption = false;
                 Visible = Step1Visible;
                 group("Welcome to Sales Price Weight Setup")
                 {
+                    Visible = Step1Visible;
                     Caption = 'Welcome to Sales Price Weight Setup';
                     InstructionalText = 'To prepare Dynamics 365 Business Central Sales Price Weight extension.';
+                }
+                group("Let's go!")
+                {
+                    Visible = Step1Visible;
+                    Caption = 'Let''s go!';
+                    InstructionalText = 'Choose Next so you can specify weight of sales prices.';
                 }
             }
             group(Step2)
             {
-                Caption = 'Enter weight.';
+                ShowCaption = false;
                 InstructionalText = 'Please enter weight for following sales price type. The lower the value, the higher the priority is.';
                 Visible = Step2Visible;
 
-                repeater(SalesPriceTypeWeight)
+                part(SalesPriceTypeWeight; ad_SalesPriceWeightListPart)
                 {
-                    field(Code; Code)
-                    {
-                        ApplicationArea = All;
-                    }
-                    field(Weight; Weight)
-                    {
-                        ApplicationArea = All;
-                    }
+                    ApplicationArea = All;
+                    Caption = '';
                 }
             }
             group(Step3)
@@ -74,9 +74,10 @@ page 50002 ad_SalesPriceWeightWizard
             {
                 ApplicationArea = All;
                 Caption = 'Back';
-                Enabled = BackActionEnabled;
+                Enabled = BackEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
+
                 trigger OnAction();
                 begin
                     NextStep(true);
@@ -86,9 +87,10 @@ page 50002 ad_SalesPriceWeightWizard
             {
                 ApplicationArea = All;
                 Caption = 'Next';
-                Enabled = NextActionEnabled;
+                Enabled = NextEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
+
                 trigger OnAction();
                 begin
                     NextStep(false);
@@ -98,7 +100,7 @@ page 50002 ad_SalesPriceWeightWizard
             {
                 ApplicationArea = All;
                 Caption = 'Finish';
-                Enabled = FinishActionEnabled;
+                Enabled = DoneVisible;
                 Image = Approve;
                 InFooterBar = true;
                 trigger OnAction();
@@ -120,7 +122,7 @@ page 50002 ad_SalesPriceWeightWizard
 
     local procedure EnableControls();
     begin
-        ResetControls();
+        ResetWizardControls();
 
         case Step of
             Step::Start:
@@ -135,9 +137,7 @@ page 50002 ad_SalesPriceWeightWizard
     local procedure ShowStep1();
     begin
         Step1Visible := true;
-
-        FinishActionEnabled := false;
-        BackActionEnabled := false;
+        BackEnabled := false;
     end;
 
     local procedure ShowStep2();
@@ -149,16 +149,18 @@ page 50002 ad_SalesPriceWeightWizard
     begin
         Step3Visible := true;
 
-        NextActionEnabled := false;
-        FinishActionEnabled := true;
+        NextEnabled := false;
+        DoneVisible := true;
     end;
 
-    local procedure ResetControls();
+    local procedure ResetWizardControls();
     begin
-        FinishActionEnabled := false;
-        BackActionEnabled := true;
-        NextActionEnabled := true;
+        //  buttons
+        DoneVisible := false;
+        BackEnabled := true;
+        NextEnabled := true;
 
+        //  tabs
         Step1Visible := false;
         Step2Visible := false;
         Step3Visible := false;
@@ -171,21 +173,7 @@ page 50002 ad_SalesPriceWeightWizard
     end;
 
     local procedure StoreRecordVar();
-    var
-        RecordVar: Record "Company Information";
     begin
-        if not RecordVar.Get() then begin
-            RecordVar.Init();
-            RecordVar.Insert();
-        end;
-
-        RecordVar.TransferFields(Rec, false);
-        RecordVar.Modify(true);
-    end;
-
-    trigger OnInit();
-    begin
-        LoadTopBanners();
     end;
 
     local procedure LoadTopBanners();
@@ -201,15 +189,49 @@ page 50002 ad_SalesPriceWeightWizard
                 TopBannerVisible := MediaResourcesDone."Media Reference".HasValue();
     end;
 
+    local procedure WizardIsAllowed(): Boolean
     var
+        SalesPriceWeight: Record ad_SalesPriceSourceTypeWeight;
+    begin
+        exit(SalesPriceWeight.IsEmpty);
+    end;
+
+    trigger OnInit();
+    begin
+        LoadTopBanners();
+    end;
+
+    trigger OnOpenPage()
+    begin
+        if not WizardIsAllowed then
+            Step := Step::Finish;
+
+        EnableControls;
+    end;
+
+
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+    begin
+        if not (CloseAction = ACTION::OK) then
+            exit;
+
+        if WizardIsAllowed and AssistedSetup.ExistsAndIsNotComplete(PAGE::ad_SalesPriceWeightWizard) then
+            if not Confirm(SetupNotFinished, false) then
+                Error('');
+    end;
+
+    var
+        SetupNotFinished: Label 'Sales price weight has not been set up.\\Are you sure you want to exit?';
         MediaRepositoryDone: Record "Media Repository";
         MediaRepositoryStd: Record "Media Repository";
         MediaResourcesDone: Record "Media Resources";
         MediaResourcesStd: Record "Media Resources";
         TopBannerVisible: Boolean;
-        BackActionEnabled: Boolean;
-        FinishActionEnabled: Boolean;
-        NextActionEnabled: Boolean;
+        BackEnabled: Boolean;
+        DoneVisible: Boolean;
+        NextEnabled: Boolean;
         Step1Visible: Boolean;
         Step2Visible: Boolean;
         Step3Visible: Boolean;

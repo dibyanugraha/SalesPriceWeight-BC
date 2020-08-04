@@ -11,7 +11,7 @@
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
             "disableHttpRequestTimeout": true,
-            "sandboxName": "sandboxw1",
+            "sandboxName": "sandboxid",
             "longRunningSqlStatementsThreshold": 500,
             "numberOfSqlStatements": 10,
         }
