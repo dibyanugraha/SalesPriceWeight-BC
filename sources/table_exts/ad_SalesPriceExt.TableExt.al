@@ -11,53 +11,25 @@ tableextension 50000 ad_SalesPriceExt extends "Sales Price"
 
     trigger OnBeforeInsert()
     begin
-        case "Sales Type" of
-            "Sales Type"::"All Customers":
-                begin
-                    Weight := 1;
-                end;
-            "Sales Type"::Campaign:
-                begin
-                    Weight := 5;
-                end;
-            "Sales Type"::"Customer Price Group":
-                begin
-                    Weight := 10;
+        if "Item No." = '' then
+            exit;
+        if not PriceWeight.Get("Sales Type") then
+            exit;
 
-                end;
-            "Sales Type"::Customer:
-                begin
-                    Weight := 20;
-
-                end;
-            else
-        end;
+        Weight := PriceWeight.Weight;
     end;
 
     trigger OnbeforeRename()
     begin
-        if xRec."Sales Type" <> "Sales Type" then
-            case "Sales Type" of
-                "Sales Type"::"All Customers":
-                    begin
-                        Weight := 1;
-                    end;
-                "Sales Type"::Campaign:
-                    begin
+        if "Item No." = '' then
+            exit;
 
-                        Weight := 5;
-                    end;
-                "Sales Type"::"Customer Price Group":
-                    begin
-                        Weight := 10;
+        if not PriceWeight.Get("Sales Type") then
+            exit;
 
-                    end;
-                "Sales Type"::Customer:
-                    begin
-                        Weight := 20;
-
-                    end;
-                else
-            end;
+        Weight := PriceWeight.Weight;
     end;
+
+    var
+        PriceWeight: Record ad_SalesPriceSourceTypeWeight;
 }
