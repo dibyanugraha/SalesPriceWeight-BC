@@ -19,7 +19,6 @@ tableextension 50000 ad_SalesPriceExt extends "Sales Price"
             if not PriceWeight.FindFirst() then
                 exit;
         end;
-        Message('%1 - %2', Format(PriceWeight.Code), Format(PriceWeight.Weight));
         Weight := PriceWeight.Weight;
     end;
 
@@ -33,7 +32,6 @@ tableextension 50000 ad_SalesPriceExt extends "Sales Price"
             if not PriceWeight.FindFirst() then
                 exit;
         end;
-        Message('%1 - %2', Format(PriceWeight.Code), Format(PriceWeight.Weight));
         Weight := PriceWeight.Weight;
     end;
 

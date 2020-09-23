@@ -4,7 +4,7 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
     var
         PriceCalculationSetup: Record "Price Calculation Setup";
     begin
-        PriceCalculationSetup.SetRange(Implementation, PriceCalculationSetup.Implementation::"Business Central (Version 16.0)");
+        PriceCalculationSetup.SetRange(Implementation, PriceCalculationSetup.Implementation::Weight);
         PriceCalculationSetup.DeleteAll();
         AddSupportedSetup(PriceCalculationSetup);
         PriceCalculationSetup.ModifyAll(Default, true);
@@ -57,8 +57,9 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
         if not CurrLineWithPrice.CopyToBuffer(PriceCalculationBufferMgt) then
             exit;
         AmountType := AmountTypeFromPriceType(CurrPriceCalculationSetup.Type);
-        if FindLines(AmountType, TempPriceListLine, PriceCalculationBufferMgt, false) then
+        if FindLines(AmountType, TempPriceListLine, PriceCalculationBufferMgt, false) then begin
             FoundPrice := CalcBestAmount(AmountType, PriceCalculationBufferMgt, TempPriceListLine);
+        end;
         if not FoundPrice then
             PriceCalculationBufferMgt.FillBestLine(AmountType, TempPriceListLine);
         if CurrLineWithPrice.IsPriceUpdateNeeded(AmountType, FoundPrice, CalledByFieldNo) then
@@ -114,6 +115,7 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
     var
         AmountType: enum "Price Amount Type";
     begin
+        message('current price calculation setup is %1', format(CurrPriceCalculationSetup.Type));
         AmountType := AmountTypeFromPriceType(CurrPriceCalculationSetup.Type);
         Pick(AmountType);
     end;
@@ -149,7 +151,7 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
     begin
         TempPriceCalculationSetup.Init();
         TempPriceCalculationSetup."Asset Type" := TempPriceCalculationSetup."Asset Type"::Item;
-        TempPriceCalculationSetup.Validate(Implementation, TempPriceCalculationSetup.Implementation::"Business Central (Version 16.0)");
+        TempPriceCalculationSetup.Validate(Implementation, TempPriceCalculationSetup.Implementation::Weight);
         TempPriceCalculationSetup.Method := TempPriceCalculationSetup.Method::"Weight";
         TempPriceCalculationSetup.Enabled := not IsDisabled();
         TempPriceCalculationSetup.Type := TempPriceCalculationSetup.Type::Purchase;
@@ -172,6 +174,7 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
                 BestPriceListLine := PriceListLine;
                 FoundBestLine := true;
             end;
+            message('PickBestLine: best price now is %1', format(BestPriceListLine."Unit Price"));
         end;
         OnAfterPickBestLine(AmountType, PriceListLine, BestPriceListLine, FoundBestLine);
     end;
@@ -204,9 +207,9 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
     begin
         case AmountType of
             AmountType::Price:
-                Result := IsBetterPrice(PriceListLine, PriceListLine."Unit Price", BestPriceListLine);
+                Result := PriceListLine.Weight < BestPriceListLine.Weight; //IsBetterPrice(PriceListLine, PriceListLine."Unit Price", BestPriceListLine);
             AmountType::Cost:
-                Result := IsBetterPrice(PriceListLine, PriceListLine."Unit Cost", BestPriceListLine);
+                Result := PriceListLine.Weight < BestPriceListLine.Weight; //IsBetterPrice(PriceListLine, PriceListLine."Unit Cost", BestPriceListLine);
             AmountType::Discount:
                 Result := PriceListLine."Line Discount %" > BestPriceListLine."Line Discount %";
         end;
@@ -219,6 +222,7 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
         // if not BestPriceListLine.IsRealLine() then
         //     exit(true);
         // exit(PriceListLine."Line Amount" < BestPriceListLine."Line Amount");
+        //message('PriceListLine.Weight is %1, BestPriceListLine.Weight is %2', format(PriceListLine.Weight), format(BestPriceListLine.Weight));
         exit(PriceListLine.Weight < BestPriceListLine.Weight);
     end;
 
@@ -313,6 +317,8 @@ codeunit 50001 ad_PriceCalculationByWeight Implements "Price Calculation"
             until PriceListLine.Next() = 0;
         if FoundBestPrice then
             PriceListLine := BestPriceListLine;
+
+        message('CalcBestAmount: best price now is %1', format(PriceListLine."Unit Price"));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Price Calculation Mgt.", 'OnFindSupportedSetup', '', false, false)]
